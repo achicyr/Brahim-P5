@@ -14,9 +14,13 @@ showInCart().catch(function(err) {
 });
 
 async function showInCart() {
+    console.log(localStorage);
     for(item in localStorage) {
+        console.log(item);
         productInCart = JSON.parse(localStorage.getItem(item));
+        console.log(productInCart);
         if(productInCart) {
+            console.log("ok"+item);
             let newItemCard = document.createElement("article");
             newItemCard.setAttribute("class", "cart__item");
             newItemCard.setAttribute("data-id", `${productInCart[0].id}`);
@@ -80,11 +84,20 @@ async function countTotalItemsInCart() {
 }
 
 async function countTotalPriceInCart() {
-    let itemsPrices = [];
-    allCartItems = document.querySelectorAll("article.cart__item");
+    let itemsPrices = [], aa;
+    // allCartItems = document.querySelectorAll("article.cart__item");
+    allCartItems = Object.keys(localStorage).length
     if(allCartItems.length === 0) {
         totalPriceInCart = 0
     } else {
+        for(aa in localStorage)if(localStorage.hasOwnProperty(aa)){
+            // console.log(localStorage[aa]);
+            let tmpItem = JSON.parse(localStorage[aa])
+            console.log(parseInt(tmpItem[0].quantity));
+            console.log(parseInt(tmpItem[0].price));
+            itemsPrices.push(parseInt(tmpItem[0].quantity) * parseInt(tmpItem[0].price))
+        }
+    /*
     allCartItems.forEach(element => {
         let input = element.querySelector("input");
         let itemId = input.closest("article").getAttribute("data-id");
@@ -100,6 +113,7 @@ async function countTotalPriceInCart() {
             itemsPrices.push(itemObject[0].price * itemObject[0].quantity)
         }
     });   
+    */
     totalPriceInCart = itemsPrices.reduce((partialSum, a) => partialSum + a, 0);
     }
     console.log(`Total price in cart is ${totalPriceInCart}`)
@@ -144,12 +158,46 @@ async function deleteItemInCart(e) {
     // showTotalOnPage();
 }
 
-async function modifyItemQuantity() {
+async function modifyItemQuantity(e) {
+
+    console.log(e);
+    console.log(e.target);
+    let a
+    , ls = {}
+    , input = e.target
+    , article = input.closest('article')
+    console.log(article);
+    let itemName = article.querySelector('h2').innerHTML
+    , itemColor = article.dataset.color
+    , item = JSON.parse(localStorage[itemName + " " + itemColor])
+    item[0].quantity = input.value
+    localStorage[itemName + " " + itemColor] = JSON.stringify(item)
+    countTotalPriceInCart()
+    countTotalItemsInCart()
+    /*
+    console.log(input);
+    for(a in localStorage)if(localStorage.hasOwnProperty(a)) {
+        console.log(a);
+        console.log(localStorage[a]);
+        let tmpItem = JSON.parse(localStorage[a])
+        console.log(a)
+        console.log(itemName + " " + itemColor)
+        if(a == itemName + " " + itemColor){
+            tmpItem[0].quantity = input.value
+        }
+        ls[a] = tmpItem
+        localStorage[a] = JSON.stringify(tmpItem)
+    }
+    console.log(ls)
+    */
+    
+    
+    /*
     allQuantityInputs.forEach(element => {
         let itemQuantityValue = element.value;
         countTotalItemsInCart();
         countTotalPriceInCart();
-        deleteItemInCart();
+        // deleteItemInCart(e);
         itemToChange = element.closest("article.cart__item");
         itemToChangeId = itemToChange.getAttribute("data-id");
         item = fetchItemToChange();
@@ -160,6 +208,7 @@ async function modifyItemQuantity() {
         // console.log(localStorage);
 
     });   
+    */
 //    for(item in cartItemsList) {
         
 //    }
